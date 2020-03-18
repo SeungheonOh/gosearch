@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func BenchmarkTest(*testing.B) {
+func BenchmarkTest(b *testing.B) {
 	list := []string{
 		"Adult",
 		"Aeroplane",
@@ -1245,9 +1245,9 @@ func BenchmarkTest(*testing.B) {
 		"yourself",
 	}
 
-	target := "Spec"
-
-	fmt.Println("size:", len(list), "Search for ", target)
-
-	fmt.Println("Results: ", search(target, list, 0.75))
+	for i := 0; i < b.N; i++ {
+		target := "Spec"
+		fmt.Println("size:", len(list), "Search for ", target)
+		fmt.Println("Results: ", search(target, list, 0.75))
+	}
 }
