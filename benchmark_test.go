@@ -1248,6 +1248,6 @@ func BenchmarkTest(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		target := "Spec"
 		fmt.Println("size:", len(list), "Search for ", target)
-		fmt.Println("Results: ", search(target, list, 0.75))
+		fmt.Println("Results: ", search(target, list, 3))
 	}
 }
