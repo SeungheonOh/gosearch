@@ -1,37 +1,55 @@
 package gosearch
 
-func similarity(original, given string) (int, float64) {
-	matching_characters := make([]int, len(original))
-	matching := 0
+const DefaultSimilarity = 0.75
+
+func similarity(original, given []rune, matchingChars []int) (eqCount int, similarity float64) {
 	for i := 0; i < len(given); i++ { // given loop
-		for j := matching_characters[matching]; j < len(original); j++ { //original loop
+		for j := 0; j < len(original); j++ { //original loop
 			if given[i] == original[j] {
-				if matching > 1 && j == matching_characters[matching-1] {
+				if l := len(matchingChars); l > 1 && j == matchingChars[l-2] {
 					continue
 				}
-				matching_characters[matching] = j
-				matching++
+
+				matchingChars = append(matchingChars, j)
 				break
 			}
 		}
 	}
 
-	panelty := 0
-	for i := 1; i < matching; i++ {
-		if matching_characters[i-1]+1 != matching_characters[i] {
-			panelty++
+	var penalty = 0
+
+	for i := 1; i < len(matchingChars); i++ {
+		if matchingChars[i-1]+1 != matchingChars[i] {
+			penalty++
 		}
 	}
 
-	return matching, float64(matching)/float64(len(given)) - float64(panelty)*0.1
+	eqCount = len(matchingChars)
+	similarity = float64(len(matchingChars))/float64(len(given)) - float64(penalty)*0.1
+
+	return
 }
 
-func search(given string, lines []string, similarity_limit float64) []string {
-	ret := make([]string, 1)
-	for _, l := range lines {
-		_, sim := similarity(l, given)
-		if sim >= similarity_limit {
-			ret = append(ret, l)
+func Search(given string, lines []string) []int {
+	return SearchLimit(given, lines, DefaultSimilarity)
+}
+
+func SearchLimit(given string, lines []string, similarityLimit float64) []int {
+	if len(lines) == 0 {
+		return []int{}
+	}
+
+	ret := make([]int, 0, len(lines))
+
+	matchingChars := make([]int, 0, len(lines[0]))
+
+	givenRunes := []rune(given)
+
+	for i, l := range lines {
+		matchingChars = matchingChars[:0]
+
+		if _, sim := similarity([]rune(l), givenRunes, matchingChars); sim >= similarityLimit {
+			ret = append(ret, i)
 		}
 	}
 
